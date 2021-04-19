@@ -733,7 +733,7 @@ mod gen {
                     }
                 )
             };
-        };
+        }
 
         word_edit_pair!(
             "lowercase",
