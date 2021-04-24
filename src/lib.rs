@@ -85,8 +85,8 @@
 //!
 //! See the [`GP`] trait for details and an example.
 //!
-//! [Human-level concept learning through probabilistic program induction]: http://web.mit.edu/cocosci/Papers/Science-2015-Lake-1332-8.pdf
-//! [Bootstrap learning via modular concept discovery]: https://hips.seas.harvard.edu/files/dechter-bootstrap-ijcai-2013.pdf
+//! [Human-level concept learning through probabilistic program induction]: https://science.sciencemag.org/content/350/6266/1332
+//! [Bootstrap learning via modular concept discovery]: https://dash.harvard.edu/handle/1/11223358
 //! [_A Field Guide to Genetic Programming_]: http://www.gp-field-guide.org.uk
 //! [`Task`]: struct.Task.html
 //! [`observation`]: struct.Task.html#structfield.observation
