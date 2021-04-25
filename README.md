@@ -39,7 +39,7 @@ induce a sentence that matches an example:
 extern crate polytype;
 extern crate programinduction;
 
-use programinduction::{ECParams, EC};
+use programinduction::{EcParams, EC};
 use programinduction::pcfg::{task_by_evaluation, Grammar, Rule};
 
 fn evaluate(name: &str, inps: &[i32]) -> Result<i32, ()> {
@@ -60,7 +60,7 @@ fn main() {
             Rule::new("plus", tp!(@arrow[tp!(EXPR), tp!(EXPR), tp!(EXPR)]), 1.0),
         ],
     );
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 1,
         search_limit_timeout: None,
         search_limit_description_length: Some(8.0),
@@ -84,7 +84,7 @@ the EC algorithm with a polymorphically-typed lambda calculus representation
 extern crate polytype;
 extern crate programinduction;
 
-use programinduction::{domains, lambda, ECParams, EC};
+use programinduction::{domains, lambda, EcParams, EC};
 
 fn main() {
     // circuit DSL
@@ -94,7 +94,7 @@ fn main() {
     ]);
     // parameters
     let lambda_params = lambda::CompressionParams::default();
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 1,
         search_limit_timeout: Some(std::time::Duration::new(1, 0)),
         search_limit_description_length: None,

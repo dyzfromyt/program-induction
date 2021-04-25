@@ -6,11 +6,11 @@
 //!
 //! ```
 //! use programinduction::domains::circuits;
-//! use programinduction::{ECParams, EC};
+//! use programinduction::{EcParams, EC};
 //!
 //! let dsl = circuits::dsl();
 //! let tasks = circuits::make_tasks(250);
-//! let ec_params = ECParams {
+//! let ec_params = EcParams {
 //!     frontier_limit: 100,
 //!     search_limit_timeout: None,
 //!     search_limit_description_length: Some(9.0),
@@ -55,7 +55,7 @@ pub type Space = bool;
 /// # #[macro_use] extern crate polytype;
 /// # extern crate programinduction;
 /// use programinduction::domains::circuits;
-/// use programinduction::{lambda, ECParams, EC};
+/// use programinduction::{lambda, EcParams, EC};
 ///
 /// # fn main() {
 /// let dsl = circuits::dsl();
@@ -69,7 +69,7 @@ pub type Space = bool;
 ///     ptp!(@arrow[tp!(bool), tp!(bool)]),
 ///     &examples,
 /// );
-/// let ec_params = ECParams {
+/// let ec_params = EcParams {
 ///     frontier_limit: 1,
 ///     search_limit_timeout: None,
 ///     search_limit_description_length: Some(5.0),

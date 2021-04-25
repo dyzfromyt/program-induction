@@ -7,7 +7,7 @@ use std::time::Duration;
 use programinduction::domains::{circuits, strings};
 use programinduction::lambda;
 use programinduction::pcfg::{self, Grammar, Rule};
-use programinduction::{ECParams, EC};
+use programinduction::{EcParams, EC};
 
 fn arith_evaluate(name: &str, inps: &[i32]) -> Result<i32, ()> {
     match name {
@@ -23,7 +23,7 @@ fn arith_evaluate(name: &str, inps: &[i32]) -> Result<i32, ()> {
 fn ec_circuits_dl() {
     let dsl = circuits::dsl();
     let tasks = circuits::make_tasks(100);
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 10,
         search_limit_timeout: None,
         search_limit_description_length: Some(9.0),
@@ -38,7 +38,7 @@ fn ec_circuits_dl() {
 fn explore_circuits_timeout() {
     let dsl = circuits::dsl();
     let tasks = circuits::make_tasks(100);
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 10,
         search_limit_timeout: Some(Duration::new(1, 0)),
         search_limit_description_length: None,
@@ -58,7 +58,7 @@ fn explore_arith_pcfg() {
             Rule::new("plus", tp!(@arrow[tp!(EXPR), tp!(EXPR), tp!(EXPR)]), 1.0),
         ],
     );
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 1,
         search_limit_timeout: None,
         search_limit_description_length: Some(8.0),
@@ -86,7 +86,7 @@ fn explore_strings() {
         &examples,
     );
 
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 1,
         search_limit_timeout: None,
         search_limit_description_length: Some(13.0),
@@ -133,7 +133,7 @@ fn ec_strings() {
         })
         .collect::<Vec<_>>();
 
-    let ec_params = ECParams {
+    let ec_params = EcParams {
         frontier_limit: 10,
         search_limit_timeout: None,
         search_limit_description_length: Some(13.0),

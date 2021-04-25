@@ -15,7 +15,7 @@ use Task;
 ///
 /// The first of these limits/timeouts to be hit determines termination of enumeration. It is
 /// dangerous to have both search limits set to `None`!
-pub struct ECParams {
+pub struct EcParams {
     /// The maximum frontier size; the number of task solutions to be hit before enumeration is
     /// stopped for a particular task.
     pub frontier_limit: usize,
@@ -44,12 +44,12 @@ pub struct ECParams {
 /// ```ignore
 /// extern crate programinduction;
 /// use programinduction::domains::circuits;
-/// use programinduction::{lambda, ECParams, EC};
+/// use programinduction::{lambda, EcParams, EC};
 ///
 /// fn main() {
 ///     let mut dsl = circuits::dsl();
 ///     let tasks = circuits::make_tasks(250);
-///     let ec_params = ECParams {
+///     let ec_params = EcParams {
 ///         frontier_limit: 10,
 ///         search_limit_timeout: None,
 ///         search_limit_description_length: Some(9.0),
@@ -123,12 +123,12 @@ pub trait EC: Send + Sync + Sized {
     /// ```ignore
     /// # extern crate programinduction;
     /// use programinduction::domains::circuits;
-    /// use programinduction::{lambda, ECParams, EC};
+    /// use programinduction::{lambda, EcParams, EC};
     ///
     /// # fn main() {
     /// let mut dsl = circuits::dsl();
     /// let tasks = circuits::make_tasks(250);
-    /// let ec_params = ECParams {
+    /// let ec_params = EcParams {
     ///     frontier_limit: 10,
     ///     search_limit_timeout: None,
     ///     search_limit_description_length: Some(8.0),
@@ -155,7 +155,7 @@ pub trait EC: Send + Sync + Sized {
     ///
     fn ec<O: Sync>(
         &self,
-        ecparams: &ECParams,
+        ecparams: &EcParams,
         params: &Self::Params,
         tasks: &[Task<Self, Self::Expression, O>],
     ) -> (Self, Vec<ECFrontier<Self>>) {
@@ -181,7 +181,7 @@ pub trait EC: Send + Sync + Sized {
     /// [`ec`]: #method.ec
     fn ec_with_recognition<O: Sync, R>(
         &self,
-        ecparams: &ECParams,
+        ecparams: &EcParams,
         params: &Self::Params,
         tasks: &[Task<Self, Self::Expression, O>],
         recognizer: R,
@@ -209,7 +209,7 @@ pub trait EC: Send + Sync + Sized {
     /// # extern crate polytype;
     /// # extern crate programinduction;
     /// use programinduction::pcfg::{Grammar, Rule, task_by_evaluation};
-    /// use programinduction::{EC, ECParams};
+    /// use programinduction::{EC, EcParams};
     ///
     /// fn evaluator(name: &str, inps: &[i32]) -> Result<i32, ()> {
     ///     match name {
@@ -229,7 +229,7 @@ pub trait EC: Send + Sync + Sized {
     ///         Rule::new("plus", tp!(@arrow[tp!(EXPR), tp!(EXPR), tp!(EXPR)]), 1.0),
     ///     ],
     /// );
-    /// let ec_params = ECParams {
+    /// let ec_params = EcParams {
     ///     frontier_limit: 1,
     ///     search_limit_timeout: Some(std::time::Duration::new(1, 0)),
     ///     search_limit_description_length: None,
@@ -243,7 +243,7 @@ pub trait EC: Send + Sync + Sized {
     /// ```
     fn explore<O: Sync>(
         &self,
-        ec_params: &ECParams,
+        ec_params: &EcParams,
         tasks: &[Task<Self, Self::Expression, O>],
     ) -> Vec<ECFrontier<Self>> {
         let mut tps = HashMap::new();
@@ -269,7 +269,7 @@ pub trait EC: Send + Sync + Sized {
     /// [`explore`]: #method.explore
     fn explore_with_recognition<O: Sync>(
         &self,
-        ec_params: &ECParams,
+        ec_params: &EcParams,
         tasks: &[Task<Self, Self::Expression, O>],
         representations: &[Self],
     ) -> Vec<ECFrontier<Self>> {
@@ -296,7 +296,7 @@ pub trait EC: Send + Sync + Sized {
 /// and enumeration is stopped when `params.search_limit` valid expressions have been checked.
 fn enumerate_solutions<L, X, O: Sync>(
     repr: &L,
-    params: &ECParams,
+    params: &EcParams,
     tp: TypeSchema,
     tasks: Vec<(usize, &Task<L, X, O>)>,
 ) -> Vec<(usize, ECFrontier<L>)>

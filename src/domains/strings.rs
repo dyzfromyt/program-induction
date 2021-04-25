@@ -4,11 +4,11 @@
 //!
 //! ```ignore
 //! use programinduction::domains::strings;
-//! use programinduction::{ECParams, EC};
+//! use programinduction::{EcParams, EC};
 //!
 //! let dsl = strings::dsl();
 //! let tasks = strings::make_tasks(250, 4);
-//! let ec_params = ECParams {
+//! let ec_params = EcParams {
 //!     frontier_limit: 10,
 //!     search_limit_timeout: None,
 //!     search_limit_description_length: Some(15.0),
@@ -156,7 +156,7 @@ impl PartialEq for Space {
 /// extern crate polytype;
 /// extern crate programinduction;
 /// use programinduction::domains::strings;
-/// use programinduction::{lambda, ECParams, EC};
+/// use programinduction::{lambda, EcParams, EC};
 ///
 /// # fn main() {
 /// let dsl = strings::dsl();
@@ -173,7 +173,7 @@ impl PartialEq for Space {
 ///     &examples,
 /// );
 ///
-/// let ec_params = ECParams {
+/// let ec_params = EcParams {
 ///     frontier_limit: 10,
 ///     search_limit_timeout: None,
 ///     search_limit_description_length: Some(12.0),
@@ -440,7 +440,7 @@ mod gen {
         (0..size).map(|_| white_word(rng)).join(&delim.to_string())
     }
 
-    #[allow(clippy::cyclomatic_complexity)]
+    #[allow(clippy::cognitive_complexity)]
     #[allow(clippy::redundant_closure_call)]
     #[allow(clippy::type_complexity)]
     pub fn make_examples(
