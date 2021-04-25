@@ -11,7 +11,7 @@ use Task;
 /// The mechanism by which individuals are selected for inclusion in the
 /// population.
 #[derive(Deserialize, Serialize)]
-pub enum GPSelection {
+pub enum GpSelection {
     /// `Deterministic` implies a strict survival-of-the-fittest selection
     /// mechanism, in which the best individuals are always retained. An
     /// individual can only be removed from a population if a better-scoring
@@ -37,7 +37,7 @@ pub enum GPSelection {
     /// relatively unlikely, and impossible if the individual is considered one
     /// of the "best" in the population. The number of "best" individuals is
     /// `floor(population.len() * deterministic_proportion)`, where
-    /// `deterministic_proportion` is `GPSelection::Hybrid.0`. It should vary
+    /// `deterministic_proportion` is `GpSelection::Hybrid.0`. It should vary
     /// from 0 to 1.
     #[serde(alias = "hybrid")]
     Hybrid(f64),
@@ -53,7 +53,7 @@ pub enum GPSelection {
     Resample,
 }
 
-impl GPSelection {
+impl GpSelection {
     pub(crate) fn update_population<'a, R: Rng, X: Clone + Send + Sync>(
         &self,
         population: &mut Vec<(X, f64)>,
@@ -69,7 +69,7 @@ impl GPSelection {
             })
             .collect_vec();
         match self {
-            GPSelection::Drift(alpha) => {
+            GpSelection::Drift(alpha) => {
                 for (p, old_fitness) in population.iter_mut() {
                     let new_fitness = oracle(p);
                     *old_fitness = *alpha * *old_fitness + (1.0 - alpha) * new_fitness;
@@ -78,11 +78,11 @@ impl GPSelection {
                 population.extend(scored_children);
                 *population = sample_without_replacement(population, pop_size, rng);
             }
-            GPSelection::Resample => {
+            GpSelection::Resample => {
                 let pop_size = population.len();
                 *population = sample_with_replacement(&mut scored_children, pop_size, rng);
             }
-            GPSelection::Deterministic => {
+            GpSelection::Deterministic => {
                 for child in scored_children {
                     sorted_place(child, population);
                 }
@@ -93,7 +93,7 @@ impl GPSelection {
                 options.append(population);
                 options.append(&mut scored_children);
                 let mut sample_size = pop_size;
-                if let GPSelection::Hybrid(det_proportion) = self {
+                if let GpSelection::Hybrid(det_proportion) = self {
                     let n_best = (pop_size as f64 * det_proportion).ceil() as usize;
                     sample_size -= n_best;
                     options.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(Ordering::Equal));
@@ -112,7 +112,7 @@ impl GPSelection {
 pub struct GPParams {
     /// The mechanism by which individuals are selected for inclusion in the
     /// population.
-    pub selection: GPSelection,
+    pub selection: GpSelection,
     pub population_size: usize,
     // The number of individuals selected uniformly at random to participate in
     // a tournament. If 1, a single individual is selected uniformly at random,
@@ -154,7 +154,7 @@ pub struct GPParams {
 /// extern crate programinduction;
 /// extern crate rand;
 /// use programinduction::pcfg::{self, Grammar, Rule};
-/// use programinduction::{GPParams, Task, GP, GPSelection};
+/// use programinduction::{GPParams, Task, GP, GpSelection};
 /// use rand::{rngs::SmallRng, SeedableRng};
 ///
 /// fn evaluator(name: &str, inps: &[i32]) -> Result<i32, ()> {
@@ -189,7 +189,7 @@ pub struct GPParams {
 ///     };
 ///
 ///     let gpparams = GPParams {
-///         selection: GPSelection::Deterministic,
+///         selection: GpSelection::Deterministic,
 ///         population_size: 10,
 ///         tournament_size: 5,
 ///         mutation_prob: 0.6,
