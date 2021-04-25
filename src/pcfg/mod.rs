@@ -55,7 +55,7 @@ use std::fmt::Debug;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
-use {ECFrontier, Task, EC, GP};
+use {EcFrontier, Task, EC, GP};
 
 /// (representation) Probabilistic context-free grammar. Currently cannot handle bound variables or
 /// polymorphism.
@@ -353,8 +353,8 @@ impl EC for Grammar {
         &self,
         params: &Self::Params,
         _tasks: &[Task<Self, Self::Expression, O>],
-        frontiers: Vec<ECFrontier<Self>>,
-    ) -> (Self, Vec<ECFrontier<Self>>) {
+        frontiers: Vec<EcFrontier<Self>>,
+    ) -> (Self, Vec<EcFrontier<Self>>) {
         let mut counts: HashMap<Type, Vec<AtomicUsize>> = HashMap::new();
         // initialize counts to pseudocounts
         for (nt, rs) in &self.rules {

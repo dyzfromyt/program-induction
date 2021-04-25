@@ -109,8 +109,8 @@ pub trait EC: Send + Sync + Sized {
         &self,
         params: &Self::Params,
         tasks: &[Task<Self, Self::Expression, O>],
-        frontiers: Vec<ECFrontier<Self>>,
-    ) -> (Self, Vec<ECFrontier<Self>>);
+        frontiers: Vec<EcFrontier<Self>>,
+    ) -> (Self, Vec<EcFrontier<Self>>);
 
     // provided methods:
 
@@ -158,7 +158,7 @@ pub trait EC: Send + Sync + Sized {
         ecparams: &EcParams,
         params: &Self::Params,
         tasks: &[Task<Self, Self::Expression, O>],
-    ) -> (Self, Vec<ECFrontier<Self>>) {
+    ) -> (Self, Vec<EcFrontier<Self>>) {
         let frontiers = self.explore(ecparams, tasks);
         if cfg!(feature = "verbose") {
             eprintln!(
@@ -185,7 +185,7 @@ pub trait EC: Send + Sync + Sized {
         params: &Self::Params,
         tasks: &[Task<Self, Self::Expression, O>],
         recognizer: R,
-    ) -> (Self, Vec<ECFrontier<Self>>)
+    ) -> (Self, Vec<EcFrontier<Self>>)
     where
         R: FnOnce(&Self, &[Task<Self, Self::Expression, O>]) -> Vec<Self>,
     {
@@ -245,13 +245,13 @@ pub trait EC: Send + Sync + Sized {
         &self,
         ec_params: &EcParams,
         tasks: &[Task<Self, Self::Expression, O>],
-    ) -> Vec<ECFrontier<Self>> {
+    ) -> Vec<EcFrontier<Self>> {
         let mut tps = HashMap::new();
         for (i, task) in tasks.iter().enumerate() {
             tps.entry(&task.tp).or_insert_with(Vec::new).push((i, task))
         }
-        let mut results: Vec<ECFrontier<Self>> =
-            (0..tasks.len()).map(|_| ECFrontier::default()).collect();
+        let mut results: Vec<EcFrontier<Self>> =
+            (0..tasks.len()).map(|_| EcFrontier::default()).collect();
         {
             let mutex = Arc::new(Mutex::new(&mut results));
             tps.into_par_iter()
@@ -272,7 +272,7 @@ pub trait EC: Send + Sync + Sized {
         ec_params: &EcParams,
         tasks: &[Task<Self, Self::Expression, O>],
         representations: &[Self],
-    ) -> Vec<ECFrontier<Self>> {
+    ) -> Vec<EcFrontier<Self>> {
         tasks
             .par_iter()
             .zip(representations)
@@ -299,7 +299,7 @@ fn enumerate_solutions<L, X, O: Sync>(
     params: &EcParams,
     tp: TypeSchema,
     tasks: Vec<(usize, &Task<L, X, O>)>,
-) -> Vec<(usize, ECFrontier<L>)>
+) -> Vec<(usize, EcFrontier<L>)>
 where
     X: Send + Sync + Clone,
     L: EC<Expression = X>,
@@ -307,7 +307,7 @@ where
     // initialization
     let frontiers: Vec<_> = tasks // associate task id with task and frontier
         .into_iter()
-        .map(|(j, t)| (j, Some(t), ECFrontier::default()))
+        .map(|(j, t)| (j, Some(t), EcFrontier::default()))
         .collect();
     let frontiers = Arc::new(RwLock::new(frontiers));
 
@@ -392,8 +392,8 @@ where
 ///
 /// [`Expression`]: trait.EC.html#associatedtype.Expression
 #[derive(Clone, Debug)]
-pub struct ECFrontier<L: EC>(pub Vec<(L::Expression, f64, f64)>);
-impl<L: EC> ECFrontier<L> {
+pub struct EcFrontier<L: EC>(pub Vec<(L::Expression, f64, f64)>);
+impl<L: EC> EcFrontier<L> {
     pub fn push(&mut self, expr: L::Expression, log_prior: f64, log_likelihood: f64) {
         self.0.push((expr, log_prior, log_likelihood))
     }
@@ -403,18 +403,18 @@ impl<L: EC> ECFrontier<L> {
             .max_by(|&&(_, xp, xl), &&(_, yp, yl)| (xp + xl).partial_cmp(&(yp + yl)).unwrap())
     }
 }
-impl<L: EC> Default for ECFrontier<L> {
+impl<L: EC> Default for EcFrontier<L> {
     fn default() -> Self {
-        ECFrontier(vec![])
+        EcFrontier(vec![])
     }
 }
-impl<L: EC> Deref for ECFrontier<L> {
+impl<L: EC> Deref for EcFrontier<L> {
     type Target = Vec<(L::Expression, f64, f64)>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-impl<L: EC> DerefMut for ECFrontier<L> {
+impl<L: EC> DerefMut for EcFrontier<L> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

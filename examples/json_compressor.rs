@@ -6,7 +6,7 @@ extern crate serde;
 extern crate serde_json;
 
 use polytype::TypeSchema;
-use programinduction::{lambda, ECFrontier, Task};
+use programinduction::{lambda, EcFrontier, Task};
 use rayon::prelude::*;
 use std::f64;
 
@@ -70,7 +70,7 @@ struct CompressionInput {
     dsl: lambda::Language,
     params: lambda::CompressionParams,
     tasks: Vec<Task<'static, lambda::Language, lambda::Expression, ()>>,
-    frontiers: Vec<ECFrontier<lambda::Language>>,
+    frontiers: Vec<EcFrontier<lambda::Language>>,
 }
 impl From<ExternalCompressionInput> for CompressionInput {
     fn from(eci: ExternalCompressionInput) -> Self {
@@ -125,7 +125,7 @@ impl From<ExternalCompressionInput> for CompressionInput {
                         (expr, s.logprior, s.loglikelihood)
                     })
                     .collect();
-                (task, ECFrontier(sols))
+                (task, EcFrontier(sols))
             })
             .unzip();
         CompressionInput {

@@ -55,7 +55,7 @@ use std::ops::Index;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use {ECFrontier, Task, EC};
+use {EcFrontier, Task, EC};
 
 const BOUND_VAR_COST: f64 = 0.1;
 const FREE_VAR_COST: f64 = 0.01;
@@ -223,8 +223,8 @@ impl Language {
         &self,
         params: &CompressionParams,
         tasks: &[Task<Language, Expression, O>],
-        frontiers: Vec<ECFrontier<Self>>,
-    ) -> (Self, Vec<ECFrontier<Self>>) {
+        frontiers: Vec<EcFrontier<Self>>,
+    ) -> (Self, Vec<EcFrontier<Self>>) {
         compression::induce_fragment_grammar(self, params, tasks, frontiers)
     }
 
@@ -619,8 +619,8 @@ impl EC for Language {
         &self,
         params: &Self::Params,
         tasks: &[Task<Self, Self::Expression, O>],
-        frontiers: Vec<ECFrontier<Self>>,
-    ) -> (Self, Vec<ECFrontier<Self>>) {
+        frontiers: Vec<EcFrontier<Self>>,
+    ) -> (Self, Vec<EcFrontier<Self>>) {
         self.compress(params, tasks, frontiers)
     }
 }

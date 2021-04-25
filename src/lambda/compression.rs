@@ -11,7 +11,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, RwLock};
 
 use super::{Expression, Language, LinkedList};
-use {ECFrontier, Task};
+use {EcFrontier, Task};
 
 /// Parameters for grammar induction.
 ///
@@ -114,13 +114,13 @@ pub fn induce<O: Sync, I, X, P, D, F, R>(
     dsl: &Language,
     params: &CompressionParams,
     tasks: &[Task<Language, Expression, O>],
-    mut original_frontiers: Vec<ECFrontier<Language>>,
+    mut original_frontiers: Vec<EcFrontier<Language>>,
     state: I,
     proposer: P,
     proposal_to_dsl: D,
     defragment: F,
     rewrite_frontiers: R,
-) -> (Language, Vec<ECFrontier<Language>>)
+) -> (Language, Vec<EcFrontier<Language>>)
 where
     X: Send,
     I: Send + Sync,
@@ -280,8 +280,8 @@ pub fn induce_fragment_grammar<O: Sync>(
     dsl: &Language,
     params: &CompressionParams,
     tasks: &[Task<Language, Expression, O>],
-    original_frontiers: Vec<ECFrontier<Language>>,
-) -> (Language, Vec<ECFrontier<Language>>) {
+    original_frontiers: Vec<EcFrontier<Language>>,
+) -> (Language, Vec<EcFrontier<Language>>) {
     induce(
         dsl,
         params,
