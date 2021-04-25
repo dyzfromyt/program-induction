@@ -109,7 +109,7 @@ impl GpSelection {
 
 /// Parameters for genetic programming.
 #[derive(Deserialize, Serialize)]
-pub struct GPParams {
+pub struct GpParams {
     /// The mechanism by which individuals are selected for inclusion in the
     /// population.
     pub selection: GpSelection,
@@ -154,7 +154,7 @@ pub struct GPParams {
 /// extern crate programinduction;
 /// extern crate rand;
 /// use programinduction::pcfg::{self, Grammar, Rule};
-/// use programinduction::{GPParams, Task, GP, GpSelection};
+/// use programinduction::{GpParams, Task, GP, GpSelection};
 /// use rand::{rngs::SmallRng, SeedableRng};
 ///
 /// fn evaluator(name: &str, inps: &[i32]) -> Result<i32, ()> {
@@ -188,7 +188,7 @@ pub struct GPParams {
 ///         observation: (),
 ///     };
 ///
-///     let gpparams = GPParams {
+///     let gpparams = GpParams {
 ///         selection: GpSelection::Deterministic,
 ///         population_size: 10,
 ///         tournament_size: 5,
@@ -282,7 +282,7 @@ pub trait GP: Send + Sync + Sized {
         &self,
         params: &Self::Params,
         rng: &mut R,
-        gpparams: &GPParams,
+        gpparams: &GpParams,
         task: &Task<Self, Self::Expression, O>,
     ) -> Vec<(Self::Expression, f64)> {
         let exprs = self.genesis(params, rng, gpparams.population_size, &task.tp);
@@ -315,13 +315,13 @@ pub trait GP: Send + Sync + Sized {
     /// [`mutation_prob`] and perform mutation or crossover depending on the outcome until
     /// [`n_delta`] expressions are determined.
     ///
-    /// [`mutation_prob`]: struct.GPParams.html#mutation_prob
-    /// [`n_delta`]: struct.GPParams.html#n_delta
+    /// [`mutation_prob`]: struct.GpParams.html#mutation_prob
+    /// [`n_delta`]: struct.GpParams.html#n_delta
     fn evolve<R: Rng>(
         &self,
         params: &Self::Params,
         rng: &mut R,
-        gpparams: &GPParams,
+        gpparams: &GpParams,
         task: &Task<Self, Self::Expression, Self::Observation>,
         population: &mut Vec<(Self::Expression, f64)>,
     ) {

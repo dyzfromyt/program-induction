@@ -3,7 +3,7 @@ extern crate polytype;
 extern crate programinduction;
 extern crate rand;
 use programinduction::pcfg::{self, Grammar, Rule};
-use programinduction::{GPParams, GpSelection, Task, GP};
+use programinduction::{GpParams, GpSelection, Task, GP};
 use rand::{rngs::SmallRng, SeedableRng};
 
 #[test]
@@ -37,7 +37,7 @@ fn gp_sum_arith() {
         observation: (),
     };
 
-    let gpparams = GPParams {
+    let gpparams = GpParams {
         selection: GpSelection::Deterministic,
         population_size: 10,
         tournament_size: 5,
