@@ -646,7 +646,6 @@ where
                                 .map(|x| match x {
                                     Value(v) => v,
                                     Abstraction(_, _) => {
-                                        let env = env.clone();
                                         evaluator
                                             .clone()
                                             .lift(LiftedFunction(

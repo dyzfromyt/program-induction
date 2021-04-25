@@ -212,7 +212,7 @@ fn make_atom(
 ) -> Atom {
     match name {
         AtomName::Variable(s) => {
-            let v = sig.new_var(Some(s.to_string()));
+            let v = sig.new_var(Some(s));
             vars.push(schema);
             Atom::Variable(v)
         }
@@ -221,7 +221,7 @@ fn make_atom(
                 .instantiate(&mut TypeContext::default())
                 .args()
                 .map_or(0, |args| args.len());
-            let o = sig.new_op(arity as u32, Some(s.to_string()));
+            let o = sig.new_op(arity as u32, Some(s));
             ops.push(schema);
             Atom::Operator(o)
         }

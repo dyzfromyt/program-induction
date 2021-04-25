@@ -160,7 +160,7 @@ impl Lexicon {
         sig.operators()
             .into_iter()
             .find(|op| {
-                op.arity() == arity && op.name().as_ref().map(std::string::String::as_str) == name
+                op.arity() == arity && op.name().as_deref()== name
             })
             .ok_or(())
     }
