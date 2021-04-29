@@ -1,5 +1,5 @@
 use super::lexicon::Lexicon;
-use super::rewrite::TRS;
+use super::rewrite::TermRewritingSystem;
 use nom;
 use nom::types::CompleteStr;
 use nom::{Context as Nomtext, Err};
@@ -102,13 +102,13 @@ pub fn parse_lexicon(
     }
 }
 
-/// Given a [`Lexicon`], parse and typecheck a [`TRS`]. The format of the
-/// [`TRS`] is as given in [`term_rewriting`].
+/// Given a [`Lexicon`], parse and typecheck a [`TermRewritingSystem`]. The format of the
+/// [`TermRewritingSystem`] is as given in [`term_rewriting`].
 ///
 /// [`Lexicon`]: ../struct.Lexicon.html
-/// [`TRS`]: struct.TRS.html
+/// [`TermRewritingSystem`]: struct.TermRewritingSystem.html
 /// [`term_rewriting`]: ../../../term_rewriting/index.html
-pub fn parse_trs(input: &str, lex: &mut Lexicon) -> Result<TRS, ParseError> {
+pub fn parse_trs(input: &str, lex: &mut Lexicon) -> Result<TermRewritingSystem, ParseError> {
     let mut ctx = lex.0.read().expect("poisoned lexicon").ctx.clone();
     if let Ok((CompleteStr(""), t)) = trs(CompleteStr(input), lex, &mut ctx) {
         Ok(t)
@@ -324,13 +324,13 @@ fn typed_rule<'a>(
         nom::ErrorKind::Custom(0),
     )))
 }
-named_args!(trs<'a>(lex: &mut Lexicon, ctx: &mut TypeContext) <CompleteStr<'a>, TRS>,
+named_args!(trs<'a>(lex: &mut Lexicon, ctx: &mut TypeContext) <CompleteStr<'a>, TermRewritingSystem>,
     ws!(do_parse!(rules: many0!(do_parse!(many0!(ws!(comment)) >>
                                           rule_text: take_until_and_consume!(";") >>
                                           rule: expr_res!(typed_rule(&rule_text, lex, ctx)) >>
                                           many0!(ws!(comment)) >>
                                           (rule.1))) >>
-                  trs: expr_res!(TRS::new(lex, rules, ctx)) >>
+                  trs: expr_res!(TermRewritingSystem::new(lex, rules, ctx)) >>
                   (trs)))
 );
 fn add_parsed_variables_to_lexicon(lex: &Lexicon, ctx: &mut TypeContext) {

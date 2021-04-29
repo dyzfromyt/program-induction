@@ -3,7 +3,7 @@ extern crate polytype;
 extern crate programinduction;
 extern crate rand;
 use programinduction::pcfg::{self, Grammar, Rule};
-use programinduction::{GpParams, GpSelection, Task, GP};
+use programinduction::{GpParams, GpSelection, Task, Gp};
 use rand::{rngs::SmallRng, SeedableRng};
 
 #[test]

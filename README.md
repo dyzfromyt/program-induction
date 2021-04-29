@@ -39,7 +39,7 @@ induce a sentence that matches an example:
 extern crate polytype;
 extern crate programinduction;
 
-use programinduction::{EcParams, EC};
+use programinduction::{EcParams, Ec};
 use programinduction::pcfg::{task_by_evaluation, Grammar, Rule};
 
 fn evaluate(name: &str, inps: &[i32]) -> Result<i32, ()> {
@@ -84,7 +84,7 @@ the EC algorithm with a polymorphically-typed lambda calculus representation
 extern crate polytype;
 extern crate programinduction;
 
-use programinduction::{domains, lambda, EcParams, EC};
+use programinduction::{domains, lambda, EcParams, Ec};
 
 fn main() {
     // circuit DSL
@@ -102,7 +102,7 @@ fn main() {
     // randomly sample 250 circuit tasks
     let tasks = domains::circuits::make_tasks(250);
 
-    // one iteration of EC:
+    // one iteration of Ec:
     let (new_dsl, _solutions) = dsl.ec(&ec_params, &lambda_params, &tasks);
     // print the new concepts it invented, based on common structure:
     for &(ref expr, _, _) in &new_dsl.invented {
@@ -126,7 +126,7 @@ _strings_.
 - [x] Add task generation function in `domains::strings`
 - [x] Fallible evaluation (e.g. see how `domains::strings` handles `slice`).
 - [x] Lazy evaluation.
-- [x] `impl GP for pcfg::Grammar` is not yet complete.
+- [x] `impl Gp for pcfg::Grammar` is not yet complete.
 - [ ] Eta-long sidestepping (so `f` gets enumerated instead of `(λ (f $0))`)
 - [ ] Consolidate lazy/non-lazy evaluation (for ergonomics).
 - [ ] Permit non-`&'static str`-named `Type`/`TypeSchema`.
@@ -138,7 +138,7 @@ _strings_.
       grammar](http://cocosci.berkeley.edu/tom/papers/adaptornips.pdf)
       approach seems like a good direction to go, perhaps minus the Bayesian
       non-parametrics.
-- [ ] Add more learning traits (like `EC` or `GP`)
+- [ ] Add more learning traits (like `Ec` or `Gp`)
 - [ ] Add more representations
 - [ ] Add more domains
 

@@ -10,15 +10,15 @@ use term_rewriting::{
     Atom, Context, Operator, Place, Rule, RuleContext, Signature, Term, Variable, TRS as UntypedTRS,
 };
 
-use super::{SampleError, TypeError, TRS};
+use super::{SampleError, TypeError, TermRewritingSystem};
 use utils::{logsumexp, weighted_permutation};
-use GP;
+use Gp;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-/// Parameters for [`Lexicon`] genetic programming ([`GP`]).
+/// Parameters for [`Lexicon`] genetic programming ([`Gp`]).
 ///
 /// [`Lexicon`]: struct.Lexicon.html
-/// [`GP`]: ../trait.GP.html
+/// [`Gp`]: ../trait.Gp.html
 pub struct GeneticParams {
     /// The number of hypotheses crossover should generate.
     pub n_crosses: usize,
@@ -354,7 +354,7 @@ impl Lexicon {
         let lex = self.0.read().expect("poisoned lexicon");
         lex.logprior_rule(rule, schema, ctx, atom_weights, invent)
     }
-    /// Give the log probability of sampling a TRS.
+    /// Give the log probability of sampling a TermRewritingSystem.
     pub fn logprior_utrs(
         &self,
         utrs: &UntypedTRS,
@@ -368,8 +368,8 @@ impl Lexicon {
         lex.logprior_utrs(utrs, schemas, p_rule, ctx, atom_weights, invent)
     }
 
-    /// merge two `TRS` into a single `TRS`.
-    pub fn combine<R: Rng>(&self, rng: &mut R, trs1: &TRS, trs2: &TRS) -> Result<TRS, TypeError> {
+    /// merge two `TermRewritingSystem` into a single `TermRewritingSystem`.
+    pub fn combine<R: Rng>(&self, rng: &mut R, trs1: &TermRewritingSystem, trs2: &TermRewritingSystem) -> Result<TermRewritingSystem, TypeError> {
         assert_eq!(trs1.lex, trs2.lex);
         let background_size = trs1
             .lex
@@ -381,7 +381,7 @@ impl Lexicon {
         let rules1 = trs1.utrs.rules[..(trs1.utrs.len() - background_size)].to_vec();
         let rules2 = trs2.utrs.rules[..(trs2.utrs.len() - background_size)].to_vec();
         let ctx = &self.0.read().expect("poisoned lexicon").ctx;
-        let mut trs = TRS::new(&trs1.lex, rules1, ctx)?;
+        let mut trs = TermRewritingSystem::new(&trs1.lex, rules1, ctx)?;
         trs.utrs.pushes(rules2).unwrap(); // hack?
         if self.0.read().expect("poisoned lexicon").deterministic {
             trs.utrs.make_deterministic(rng);
@@ -414,7 +414,7 @@ pub(crate) struct Lex {
     pub(crate) background: Vec<Rule>,
     /// Rule templates to use when sampling rules.
     pub(crate) templates: Vec<RuleContext>,
-    /// If `true`, then the `TRS`s should be deterministic.
+    /// If `true`, then the `TermRewritingSystem`s should be deterministic.
     pub(crate) deterministic: bool,
     pub(crate) ctx: TypeContext,
 }
@@ -1001,8 +1001,8 @@ impl Lex {
         Ok(p_n_rules + p_rules)
     }
 }
-impl GP for Lexicon {
-    type Expression = TRS;
+impl Gp for Lexicon {
+    type Expression = TermRewritingSystem;
     type Params = GeneticParams;
     type Observation = Vec<Rule>;
     fn genesis<R: Rng>(
@@ -1012,7 +1012,7 @@ impl GP for Lexicon {
         pop_size: usize,
         _tp: &TypeSchema,
     ) -> Vec<Self::Expression> {
-        let trs = TRS::new(
+        let trs = TermRewritingSystem::new(
             self,
             Vec::new(),
             &self.0.read().expect("poisoned lexicon").ctx,
@@ -1077,7 +1077,7 @@ impl GP for Lexicon {
     ) -> Vec<Self::Expression> {
         let trs = self
             .combine(rng, parent1, parent2)
-            .expect("poorly-typed TRS in crossover");
+            .expect("poorly-typed TermRewritingSystem in crossover");
         iter::repeat(trs)
             .take(params.n_crosses)
             .update(|trs| {

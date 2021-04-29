@@ -55,7 +55,7 @@ use std::fmt::Debug;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
-use {EcFrontier, Task, EC, GP};
+use {EcFrontier, Task, Ec, Gp};
 
 /// (representation) Probabilistic context-free grammar. Currently cannot handle bound variables or
 /// polymorphism.
@@ -141,7 +141,7 @@ impl Grammar {
     }
     /// Set parameters based on supplied sentences. This is performed by [`Grammar::compress`].
     ///
-    /// [`Grammar::compress`]: ../trait.EC.html#method.compress
+    /// [`Grammar::compress`]: ../trait.Ec.html#method.compress
     pub fn update_parameters(&mut self, params: &EstimationParams, sentences: &[AppliedRule]) {
         let mut counts: HashMap<Type, Vec<AtomicUsize>> = HashMap::new();
         // initialize counts to pseudocounts
@@ -332,7 +332,7 @@ impl Default for EstimationParams {
     }
 }
 
-impl EC for Grammar {
+impl Ec for Grammar {
     type Expression = AppliedRule;
     type Params = EstimationParams;
 
@@ -384,12 +384,12 @@ impl EC for Grammar {
     }
 }
 
-/// Parameters for PCFG genetic programming ([`GP`]).
+/// Parameters for PCFG genetic programming ([`Gp`]).
 ///
 /// Values for each `mutation_` field should be probabilities that sum to 1. Every mutation will
 /// randomly select one of these variants.
 ///
-/// [`GP`]: ../trait.GP.html
+/// [`Gp`]: ../trait.Gp.html
 pub struct GeneticParams {
     /// The progeny factor determines the distribution over nodes in a statement when a
     /// node/subtree is randomly selected. If set to `1`, each node has uniform probability of
@@ -415,7 +415,7 @@ impl Default for GeneticParams {
     }
 }
 
-impl GP for Grammar {
+impl Gp for Grammar {
     type Expression = AppliedRule;
     type Params = GeneticParams;
     type Observation = ();

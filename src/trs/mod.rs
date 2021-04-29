@@ -14,7 +14,7 @@
 //! # #[macro_use] extern crate polytype;
 //! # extern crate programinduction;
 //! # extern crate term_rewriting;
-//! # use programinduction::trs::{TRS, Lexicon};
+//! # use programinduction::trs::{TermRewritingSystem, Lexicon};
 //! # use polytype::Context as TypeContext;
 //! # use term_rewriting::{Signature, parse_rule};
 //! # fn main() {
@@ -41,7 +41,7 @@
 //!
 //! let lexicon = Lexicon::from_signature(sig, ops, vars, vec![], vec![], false, TypeContext::default());
 //!
-//! let trs = TRS::new(&lexicon, rules, &lexicon.context());
+//! let trs = TermRewritingSystem::new(&lexicon, rules, &lexicon.context());
 //! # }
 //! ```
 
@@ -52,7 +52,7 @@ pub use self::lexicon::{GeneticParams, Lexicon};
 pub use self::parser::{
     parse_context, parse_lexicon, parse_rule, parse_rulecontext, parse_templates, parse_trs,
 };
-pub use self::rewrite::TRS;
+pub use self::rewrite::TermRewritingSystem;
 use Task;
 
 use polytype;
@@ -129,7 +129,7 @@ impl ::std::error::Error for SampleError {
     }
 }
 
-/// Parameters for a TRS-based probabilistic model.
+/// Parameters for a TermRewritingSystem-based probabilistic model.
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct ModelParams {
     /// How much partial credit is given for incorrect answers; it should be a
@@ -155,27 +155,27 @@ impl Default for ModelParams {
     }
 }
 
-/// Construct a [`Task`] evaluating [`TRS`]s (constructed from a [`Lexicon`])
+/// Construct a [`Task`] evaluating [`TermRewritingSystem`]s (constructed from a [`Lexicon`])
 /// using rewriting of inputs to outputs.
 ///
 /// Each [`term_rewriting::Rule`] in `data` must have a single RHS term. The
 /// resulting [`Task`] checks whether each datum's LHS gets rewritten to its RHS
-/// under a [`TRS`] within the constraints specified by the [`ModelParams`].
+/// under a [`TermRewritingSystem`] within the constraints specified by the [`ModelParams`].
 ///
 /// [`Lexicon`]: struct.Lexicon.html
 /// [`ModelParams`]: struct.ModelParams.html
 /// [`term_rewriting::Rule`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.Rule.html
 /// [`Task`]: ../struct.Task.html
-/// [`TRS`]: struct.TRS.html
+/// [`TermRewritingSystem`]: struct.TermRewritingSystem.html
 pub fn task_by_rewrite<'a, O: Sync>(
     data: &'a [Rule],
     params: ModelParams,
     lex: &Lexicon,
     observation: O,
-) -> Result<Task<'a, Lexicon, TRS, O>, TypeError> {
+) -> Result<Task<'a, Lexicon, TermRewritingSystem, O>, TypeError> {
     let mut ctx = lex.0.read().expect("poisoned lexicon").ctx.clone();
     Ok(Task {
-        oracle: Box::new(move |_s: &Lexicon, h: &TRS| -h.posterior(data, params)),
+        oracle: Box::new(move |_s: &Lexicon, h: &TermRewritingSystem| -h.posterior(data, params)),
         // assuming the data have no variables, we can use the Lexicon's ctx.
         tp: lex.infer_rules(data, &mut ctx)?,
         observation,

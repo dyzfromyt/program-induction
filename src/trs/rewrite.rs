@@ -19,14 +19,14 @@ use super::{Lexicon, ModelParams, SampleError, TypeError};
 
 /// Manages the semantics of a term rewriting system.
 #[derive(Debug, PartialEq, Clone)]
-pub struct TRS {
+pub struct TermRewritingSystem {
     pub(crate) lex: Lexicon,
     // INVARIANT: UntypedTRS.rules ends with lex.background
     pub(crate) utrs: UntypedTRS,
     pub(crate) ctx: TypeContext,
 }
-impl TRS {
-    /// Create a new `TRS` under the given [`Lexicon`]. Any background knowledge
+impl TermRewritingSystem {
+    /// Create a new `TermRewritingSystem` under the given [`Lexicon`]. Any background knowledge
     /// will be appended to the given ruleset.
     ///
     /// # Example
@@ -35,7 +35,7 @@ impl TRS {
     /// # #[macro_use] extern crate polytype;
     /// # extern crate programinduction;
     /// # extern crate term_rewriting;
-    /// # use programinduction::trs::{TRS, Lexicon};
+    /// # use programinduction::trs::{TermRewritingSystem, Lexicon};
     /// # use term_rewriting::{Signature, parse_rule};
     /// # use polytype::Context as TypeContext;
     /// # fn main() {
@@ -64,7 +64,7 @@ impl TRS {
     ///
     /// let ctx = lexicon.context();
     ///
-    /// let trs = TRS::new(&lexicon, rules, &ctx).unwrap();
+    /// let trs = TermRewritingSystem::new(&lexicon, rules, &ctx).unwrap();
     ///
     /// assert_eq!(trs.size(), 12);
     /// # }
@@ -74,7 +74,7 @@ impl TRS {
         lexicon: &Lexicon,
         mut rules: Vec<Rule>,
         ctx: &TypeContext,
-    ) -> Result<TRS, TypeError> {
+    ) -> Result<TermRewritingSystem, TypeError> {
         let lexicon = lexicon.clone();
         let mut ctx = ctx.clone();
         let utrs = {
@@ -84,42 +84,42 @@ impl TRS {
             lex.infer_utrs(&utrs, &mut ctx)?;
             utrs
         };
-        Ok(TRS {
+        Ok(TermRewritingSystem {
             lex: lexicon,
             utrs,
             ctx,
         })
     }
 
-    /// The size of the underlying [`term_rewriting::TRS`].
+    /// The size of the underlying [`term_rewriting::TermRewritingSystem`].
     ///
-    /// [`term_rewriting::TRS`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.TRS.html#method.size
+    /// [`term_rewriting::TermRewritingSystem`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.TermRewritingSystem.html#method.size
     pub fn size(&self) -> usize {
         self.utrs.size()
     }
 
-    /// The length of the underlying [`term_rewriting::TRS`].
+    /// The length of the underlying [`term_rewriting::TermRewritingSystem`].
     ///
-    /// [`term_rewriting::TRS`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.TRS.html#method.size
+    /// [`term_rewriting::TermRewritingSystem`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.TermRewritingSystem.html#method.size
     pub fn len(&self) -> usize {
         self.utrs.len()
     }
 
-    /// Is the underlying [`term_rewriting::TRS`] empty?.
+    /// Is the underlying [`term_rewriting::TermRewritingSystem`] empty?.
     ///
-    /// [`term_rewriting::TRS`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.TRS.html#method.size
+    /// [`term_rewriting::TermRewritingSystem`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/struct.TermRewritingSystem.html#method.size
     pub fn is_empty(&self) -> bool {
         self.utrs.is_empty()
     }
 
-    /// A pseudo log prior for a `TRS`: the negative [`size`] of the `TRS`.
+    /// A pseudo log prior for a `TermRewritingSystem`: the negative [`size`] of the `TermRewritingSystem`.
     ///
-    /// [`size`]: struct.TRS.html#method.size
+    /// [`size`]: struct.TermRewritingSystem.html#method.size
     pub fn pseudo_log_prior(&self) -> f64 {
         -(self.size() as f64)
     }
 
-    /// A log likelihood for a `TRS`: the probability of `data`'s RHSs appearing
+    /// A log likelihood for a `TermRewritingSystem`: the probability of `data`'s RHSs appearing
     /// in [`term_rewriting::Trace`]s rooted at its LHSs.
     ///
     /// [`term_rewriting::Trace`]: https://docs.rs/term_rewriting/~0.3/term_rewriting/trace/struct.Trace.html
@@ -154,8 +154,8 @@ impl TRS {
     /// Combine [`pseudo_log_prior`] and [`log_likelihood`], failing early if the
     /// prior is `0.0`.
     ///
-    /// [`pseudo_log_prior`]: struct.TRS.html#method.pseudo_log_prior
-    /// [`log_likelihood`]: struct.TRS.html#method.log_likelihood
+    /// [`pseudo_log_prior`]: struct.TermRewritingSystem.html#method.pseudo_log_prior
+    /// [`log_likelihood`]: struct.TermRewritingSystem.html#method.log_likelihood
     pub fn posterior(&self, data: &[Rule], params: ModelParams) -> f64 {
         let prior = self.pseudo_log_prior();
         if prior == NEG_INFINITY {
@@ -174,7 +174,7 @@ impl TRS {
     /// # extern crate programinduction;
     /// # extern crate rand;
     /// # extern crate term_rewriting;
-    /// # use programinduction::trs::{TRS, Lexicon};
+    /// # use programinduction::trs::{TermRewritingSystem, Lexicon};
     /// # use polytype::Context as TypeContext;
     /// # use rand::{thread_rng};
     /// # use term_rewriting::{Context, RuleContext, Signature, parse_rule};
@@ -210,7 +210,7 @@ impl TRS {
     /// }
     /// let lexicon = Lexicon::from_signature(sig, ops, vars, vec![], vec![], false, TypeContext::default());
     ///
-    /// let mut trs = TRS::new(&lexicon, rules, &lexicon.context()).unwrap();
+    /// let mut trs = TermRewritingSystem::new(&lexicon, rules, &lexicon.context()).unwrap();
     ///
     /// assert_eq!(trs.len(), 2);
     ///
@@ -237,7 +237,7 @@ impl TRS {
         atom_weights: (f64, f64, f64),
         max_size: usize,
         rng: &mut R,
-    ) -> Result<TRS, SampleError> {
+    ) -> Result<TermRewritingSystem, SampleError> {
         let mut trs = self.clone();
         let context = contexts.choose(rng).ok_or(SampleError::OptionsExhausted)?;
         let rule = trs.lex.sample_rule_from_context(
@@ -257,7 +257,7 @@ impl TRS {
     }
     /// Delete a rule from the rewrite system if possible. Background knowledge
     /// cannot be deleted.
-    pub fn delete_rule<R: Rng>(&self, rng: &mut R) -> Result<TRS, SampleError> {
+    pub fn delete_rule<R: Rng>(&self, rng: &mut R) -> Result<TermRewritingSystem, SampleError> {
         let background = &self.lex.0.read().expect("poisoned lexicon").background;
         let clauses = self.utrs.clauses();
         let deletable: Vec<_> = clauses.iter().filter(|c| !background.contains(c)).collect();
@@ -270,7 +270,7 @@ impl TRS {
             Ok(trs)
         }
     }
-    /// Move a Rule from one place in the TRS to another at random, excluding the background.
+    /// Move a Rule from one place in the TermRewritingSystem to another at random, excluding the background.
     ///
     /// # Example
     ///
@@ -279,7 +279,7 @@ impl TRS {
     /// # extern crate programinduction;
     /// # extern crate rand;
     /// # extern crate term_rewriting;
-    /// # use programinduction::trs::{TRS, Lexicon};
+    /// # use programinduction::trs::{TermRewritingSystem, Lexicon};
     /// # use rand::{thread_rng};
     /// # use polytype::Context as TypeContext;
     /// # use term_rewriting::{Context, RuleContext, Signature, parse_rule};
@@ -318,7 +318,7 @@ impl TRS {
     /// let ctx = TypeContext::default();
     /// let lexicon = Lexicon::from_signature(sig.clone(), ops, vars, vec![], vec![], false, ctx);
     ///
-    /// let mut trs = TRS::new(&lexicon, rules, &lexicon.context()).unwrap();
+    /// let mut trs = TermRewritingSystem::new(&lexicon, rules, &lexicon.context()).unwrap();
     ///
     /// let pretty_before = trs.to_string();
     ///
@@ -330,7 +330,7 @@ impl TRS {
     /// assert_eq!(new_trs.to_string(), "PLUS(x_ SUCC(y_)) = SUCC(PLUS(x_ y_));\nPLUS(x_ ZERO) = x_;");
     /// # }
     /// ```
-    pub fn randomly_move_rule<R: Rng>(&self, rng: &mut R) -> Result<TRS, SampleError> {
+    pub fn randomly_move_rule<R: Rng>(&self, rng: &mut R) -> Result<TermRewritingSystem, SampleError> {
         let mut trs = self.clone();
         let num_rules = self.len();
         let background = &self.lex.0.read().expect("poisoned lexicon").background;
@@ -347,8 +347,8 @@ impl TRS {
             Err(SampleError::OptionsExhausted)
         }
     }
-    /// Selects a rule from the TRS at random, finds all differences in the LHS and RHS,
-    /// and makes rules from those differences and inserts them back into the TRS imediately after the background.
+    /// Selects a rule from the TermRewritingSystem at random, finds all differences in the LHS and RHS,
+    /// and makes rules from those differences and inserts them back into the TermRewritingSystem imediately after the background.
     ///
     /// # Example
     ///
@@ -357,7 +357,7 @@ impl TRS {
     /// # extern crate programinduction;
     /// # extern crate rand;
     /// # extern crate term_rewriting;
-    /// # use programinduction::trs::{TRS, Lexicon};
+    /// # use programinduction::trs::{TermRewritingSystem, Lexicon};
     /// # use polytype::Context as TypeContext;
     /// # use rand::{thread_rng};
     /// # use term_rewriting::{Context, RuleContext, Signature, parse_rule};
@@ -392,7 +392,7 @@ impl TRS {
     /// }
     /// let lexicon = Lexicon::from_signature(sig, ops, vars, vec![], vec![], false, TypeContext::default());
     ///
-    /// let mut trs = TRS::new(&lexicon, rules, &lexicon.context()).unwrap();
+    /// let mut trs = TermRewritingSystem::new(&lexicon, rules, &lexicon.context()).unwrap();
     ///
     /// assert_eq!(trs.len(), 1);
     ///
@@ -407,14 +407,14 @@ impl TRS {
     /// }
     /// # }
     /// ```
-    pub fn local_difference<R: Rng>(&self, rng: &mut R) -> Result<TRS, SampleError> {
+    pub fn local_difference<R: Rng>(&self, rng: &mut R) -> Result<TermRewritingSystem, SampleError> {
         let mut trs = self.clone();
         let num_rules = self.len();
         let background = &self.lex.0.read().expect("poisoned lexicon").background;
         let num_background = background.len();
         if num_rules > num_background {
             let idx = rng.gen_range(num_background, num_rules);
-            let new_rules = TRS::local_difference_helper(&trs.utrs.rules[idx]);
+            let new_rules = TermRewritingSystem::local_difference_helper(&trs.utrs.rules[idx]);
             if !new_rules.is_empty() {
                 trs.utrs.remove_idx(idx)?;
                 trs.utrs.inserts_idx(num_background, new_rules)?;
@@ -427,7 +427,7 @@ impl TRS {
     /// returns a list of rules where each similarity is removed one at a time
     fn local_difference_helper(rule: &Rule) -> Vec<Rule> {
         if let Some(rhs) = rule.rhs() {
-            TRS::find_differences(&rule.lhs, &rhs)
+            TermRewritingSystem::find_differences(&rule.lhs, &rhs)
                 .into_iter()
                 .filter_map(|(lhs, rhs)| Rule::new(lhs, vec![rhs]))
                 .collect_vec()
@@ -454,14 +454,14 @@ impl TRS {
             ) if lop == rop && !largs.is_empty() => largs
                 .iter()
                 .zip(rargs)
-                .flat_map(|(l, r)| TRS::find_differences(l, r))
+                .flat_map(|(l, r)| TermRewritingSystem::find_differences(l, r))
                 .chain(once((lhs.clone(), rhs.clone())))
                 .collect_vec(),
             _ => vec![(lhs.clone(), rhs.clone())],
         }
     }
-    /// Selects a rule from the TRS at random, swaps the LHS and RHS if possible and inserts the resulting rules
-    /// back into the TRS imediately after the background.
+    /// Selects a rule from the TermRewritingSystem at random, swaps the LHS and RHS if possible and inserts the resulting rules
+    /// back into the TermRewritingSystem imediately after the background.
     ///
     /// # Example
     ///
@@ -470,7 +470,7 @@ impl TRS {
     /// # extern crate programinduction;
     /// # extern crate rand;
     /// # extern crate term_rewriting;
-    /// # use programinduction::trs::{TRS, Lexicon};
+    /// # use programinduction::trs::{TermRewritingSystem, Lexicon};
     /// # use polytype::Context as TypeContext;
     /// # use rand::{thread_rng};
     /// # use term_rewriting::{Context, RuleContext, Signature, parse_rule};
@@ -506,7 +506,7 @@ impl TRS {
     ///
     /// let lexicon = Lexicon::from_signature(sig, ops, vars, vec![], vec![], false, TypeContext::default());
     ///
-    /// let mut trs = TRS::new(&lexicon, rules, &lexicon.context()).unwrap();
+    /// let mut trs = TermRewritingSystem::new(&lexicon, rules, &lexicon.context()).unwrap();
     ///
     /// assert_eq!(trs.len(), 1);
     ///
@@ -543,12 +543,12 @@ impl TRS {
     ///
     /// let lexicon = Lexicon::from_signature(sig, ops, vars, vec![], vec![], false, TypeContext::default());
     ///
-    /// let mut trs = TRS::new(&lexicon, rules, &lexicon.context()).unwrap();
+    /// let mut trs = TermRewritingSystem::new(&lexicon, rules, &lexicon.context()).unwrap();
     ///
     /// assert!(trs.swap_lhs_and_rhs(&mut rng).is_err());
     /// # }
     /// ```
-    pub fn swap_lhs_and_rhs<R: Rng>(&self, rng: &mut R) -> Result<TRS, SampleError> {
+    pub fn swap_lhs_and_rhs<R: Rng>(&self, rng: &mut R) -> Result<TermRewritingSystem, SampleError> {
         let num_rules = self.len();
         let num_background = self
             .lex
@@ -560,7 +560,7 @@ impl TRS {
         if num_background <= num_rules {
             let idx = rng.gen_range(num_background, num_rules);
             let mut trs = self.clone();
-            let new_rules = TRS::swap_rule_helper(&trs.utrs.rules[idx])?;
+            let new_rules = TermRewritingSystem::swap_rule_helper(&trs.utrs.rules[idx])?;
             trs.utrs.remove_idx(idx)?;
             trs.utrs.inserts_idx(num_background, new_rules)?;
             Ok(trs)
@@ -574,7 +574,7 @@ impl TRS {
         let rules = rule
             .clauses()
             .iter()
-            .filter_map(TRS::swap_clause_helper)
+            .filter_map(TermRewritingSystem::swap_clause_helper)
             .collect_vec();
         if rules.is_empty() {
             Err(SampleError::OptionsExhausted)
@@ -588,7 +588,7 @@ impl TRS {
             .and_then(|rhs| Rule::new(rhs, vec![rule.lhs.clone()]))
     }
 }
-impl fmt::Display for TRS {
+impl fmt::Display for TermRewritingSystem {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let true_len = self.utrs.len()
             - self

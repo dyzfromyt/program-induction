@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use Task;
 
-/// Parameters for the EC algorithm.
+/// Parameters for the Ec algorithm.
 ///
 /// The first of these limits/timeouts to be hit determines termination of enumeration. It is
 /// dangerous to have both search limits set to `None`!
@@ -29,9 +29,9 @@ pub struct EcParams {
 
 /// A kind of representation suitable for **exploration-compression**.
 ///
-/// For details on the EC algorithm, see the module-level documentation [here].
+/// For details on the Ec algorithm, see the module-level documentation [here].
 ///
-/// Implementors of `EC` need only provide an [`enumerate`] and [`compress`] methods. By doing so,
+/// Implementors of `Ec` need only provide an [`enumerate`] and [`compress`] methods. By doing so,
 /// we provide the [`ec`], [`ec_with_recognition`], and [`explore`] methods.
 ///
 /// Typically, you will interact with this trait via existing implementations, such as with
@@ -44,7 +44,7 @@ pub struct EcParams {
 /// ```ignore
 /// extern crate programinduction;
 /// use programinduction::domains::circuits;
-/// use programinduction::{lambda, EcParams, EC};
+/// use programinduction::{lambda, EcParams, Ec};
 ///
 /// fn main() {
 ///     let mut dsl = circuits::dsl();
@@ -81,7 +81,7 @@ pub struct EcParams {
 /// [`explore`]: #method.explore
 /// [`lambda::Language`]: lambda/struct.Language.html
 /// [`pcfg::Grammar`]: pcfg/struct.Grammar.html
-pub trait EC: Send + Sync + Sized {
+pub trait Ec: Send + Sync + Sized {
     /// An Expression is a sentence in the representation. Tasks are solved by Expressions.
     type Expression: Clone + Send + Sync;
     /// Many representations have some parameters for compression. They belong here.
@@ -114,7 +114,7 @@ pub trait EC: Send + Sync + Sized {
 
     // provided methods:
 
-    /// The entry point for one iteration of the EC algorithm.
+    /// The entry point for one iteration of the Ec algorithm.
     ///
     /// Returned solutions include the log-prior and log-likelihood of successful expressions.
     ///
@@ -123,7 +123,7 @@ pub trait EC: Send + Sync + Sized {
     /// ```ignore
     /// # extern crate programinduction;
     /// use programinduction::domains::circuits;
-    /// use programinduction::{lambda, EcParams, EC};
+    /// use programinduction::{lambda, EcParams, Ec};
     ///
     /// # fn main() {
     /// let mut dsl = circuits::dsl();
@@ -137,7 +137,7 @@ pub trait EC: Send + Sync + Sized {
     ///
     /// let mut frontiers = Vec::new();
     /// for i in 1..6 {
-    ///     println!("running EC iteration {}", i);
+    ///     println!("running Ec iteration {}", i);
     ///
     ///     let (new_dsl, new_frontiers) = dsl.ec(&ec_params, &params, &tasks);
     ///     dsl = new_dsl;
@@ -170,7 +170,7 @@ pub trait EC: Send + Sync + Sized {
         self.compress(params, tasks, frontiers)
     }
 
-    /// The entry point for one iteration of the EC algorithm with a recognizer, very similar to
+    /// The entry point for one iteration of the Ec algorithm with a recognizer, very similar to
     /// [`ec`].
     ///
     /// The recognizer supplies a representation for every task which is then used for
@@ -209,7 +209,7 @@ pub trait EC: Send + Sync + Sized {
     /// # extern crate polytype;
     /// # extern crate programinduction;
     /// use programinduction::pcfg::{Grammar, Rule, task_by_evaluation};
-    /// use programinduction::{EC, EcParams};
+    /// use programinduction::{Ec, EcParams};
     ///
     /// fn evaluator(name: &str, inps: &[i32]) -> Result<i32, ()> {
     ///     match name {
@@ -302,7 +302,7 @@ fn enumerate_solutions<L, X, O: Sync>(
 ) -> Vec<(usize, EcFrontier<L>)>
 where
     X: Send + Sync + Clone,
-    L: EC<Expression = X>,
+    L: Ec<Expression = X>,
 {
     // initialization
     let frontiers: Vec<_> = tasks // associate task id with task and frontier
@@ -390,10 +390,10 @@ where
 ///
 /// Stores tuples of [`Expression`], log-prior, and log-likelihood.
 ///
-/// [`Expression`]: trait.EC.html#associatedtype.Expression
+/// [`Expression`]: trait.Ec.html#associatedtype.Expression
 #[derive(Clone, Debug)]
-pub struct EcFrontier<L: EC>(pub Vec<(L::Expression, f64, f64)>);
-impl<L: EC> EcFrontier<L> {
+pub struct EcFrontier<L: Ec>(pub Vec<(L::Expression, f64, f64)>);
+impl<L: Ec> EcFrontier<L> {
     pub fn push(&mut self, expr: L::Expression, log_prior: f64, log_likelihood: f64) {
         self.0.push((expr, log_prior, log_likelihood))
     }
@@ -403,18 +403,18 @@ impl<L: EC> EcFrontier<L> {
             .max_by(|&&(_, xp, xl), &&(_, yp, yl)| (xp + xl).partial_cmp(&(yp + yl)).unwrap())
     }
 }
-impl<L: EC> Default for EcFrontier<L> {
+impl<L: Ec> Default for EcFrontier<L> {
     fn default() -> Self {
         EcFrontier(vec![])
     }
 }
-impl<L: EC> Deref for EcFrontier<L> {
+impl<L: Ec> Deref for EcFrontier<L> {
     type Target = Vec<(L::Expression, f64, f64)>;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-impl<L: EC> DerefMut for EcFrontier<L> {
+impl<L: Ec> DerefMut for EcFrontier<L> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

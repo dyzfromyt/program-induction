@@ -60,11 +60,11 @@
 //! log-likelihood model (or [`oracle`]) \\(\\log\\mathbb{P}[x|p]\\). We additionally associate
 //! tasks with a type, [`tp`], to provide a straightforward constraint for finding programs which
 //! may be solutions. Programs may be expressed under different representations, so we provide a
-//! representation-agnostic trait [`EC`]. We additionally provide two such representations: a
+//! representation-agnostic trait [`Ec`]. We additionally provide two such representations: a
 //! polymorphically-typed lambda calculus in the [`lambda`] module, and a probabilistic context
 //! free grammar in the [`pcfg`] module.
 //!
-//! See the [`EC`] trait for details and an example.
+//! See the [`Ec`] trait for details and an example.
 //!
 //! # Genetic programming
 //!
@@ -80,10 +80,10 @@
 //! In this library, we represent a [`Task`] as a fitness function in the [`oracle`] field, and a
 //! constraint for relevant programs as a type in the [`tp`] field. The [`observation`] field is
 //! not utilized by GP (we recommend setting it to [`unit`]). Programs may be expressed under
-//! different representations, so we provide a representation-agnostic trait [`GP`]. We provide an
+//! different representations, so we provide a representation-agnostic trait [`Gp`]. We provide an
 //! implementation for probabilistic context free grammars in the [`pcfg`] module.
 //!
-//! See the [`GP`] trait for details and an example.
+//! See the [`Gp`] trait for details and an example.
 //!
 //! [Human-level concept learning through probabilistic program induction]: https://science.sciencemag.org/content/350/6266/1332
 //! [Bootstrap learning via modular concept discovery]: https://dash.harvard.edu/handle/1/11223358
@@ -92,8 +92,8 @@
 //! [`observation`]: struct.Task.html#structfield.observation
 //! [`oracle`]: struct.Task.html#structfield.oracle
 //! [`tp`]: struct.Task.html#structfield.tp
-//! [`EC`]: trait.EC.html
-//! [`GP`]: trait.GP.html
+//! [`Ec`]: trait.Ec.html
+//! [`Gp`]: trait.Gp.html
 //! [`lambda`]: lambda/index.html
 //! [`pcfg`]: pcfg/index.html
 //! [`unit`]: https://doc.rust-lang.org/std/primitive.unit.html
@@ -135,7 +135,7 @@ use std::f64;
 /// [`lambda::task_by_evaluation`]: lambda/fn.task_by_simple_evaluation.html
 /// [`pcfg::task_by_evaluation`]: pcfg/fn.task_by_simple_evaluation.html
 pub struct Task<'a, R: Send + Sync + Sized, X: Clone + Send + Sync, O: Sync> {
-    /// Assess an expression. For [`EC`] this should return a log-likelihood. For [`GP`] this
+    /// Assess an expression. For [`Ec`] this should return a log-likelihood. For [`Gp`] this
     /// should return the fitness, where smaller values correspond to better expressions.
     pub oracle: Box<dyn Fn(&R, &X) -> f64 + Send + Sync + 'a>,
     /// An expression that is considered valid for the `oracle` is one of this type.

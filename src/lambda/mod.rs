@@ -55,7 +55,7 @@ use std::ops::Index;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use {EcFrontier, Task, EC};
+use {EcFrontier, Task, Ec};
 
 const BOUND_VAR_COST: f64 = 0.1;
 const FREE_VAR_COST: f64 = 0.01;
@@ -198,7 +198,7 @@ impl Language {
     ///
     /// ```ignore
     /// use programinduction::domains::circuits;
-    /// use programinduction::{lambda, EcParams, EC};
+    /// use programinduction::{lambda, EcParams, Ec};
     ///
     /// let dsl = circuits::dsl();
     /// let tasks = circuits::make_tasks(100);
@@ -209,7 +209,7 @@ impl Language {
     /// };
     /// let params = lambda::CompressionParams::default();
     ///
-    /// // this is equivalent to one iteration of EC:
+    /// // this is equivalent to one iteration of Ec:
     /// let frontiers = dsl.explore(&ec_params, &tasks);
     /// let (dsl, _frontiers) = dsl.compress(&params, &tasks, frontiers);
     ///
@@ -606,7 +606,8 @@ impl Language {
         cands
     }
 }
-impl EC for Language {
+
+impl Ec for Language {
     type Expression = Expression;
     type Params = CompressionParams;
     fn enumerate<F>(&self, tp: TypeSchema, termination_condition: F)

@@ -129,7 +129,7 @@ pub struct GpParams {
 
 /// A kind of representation suitable for **genetic programming**.
 ///
-/// Implementors of `GP` must provide methods for [`genesis`], [`mutate`], [`crossover`]. A
+/// Implementors of `Gp` must provide methods for [`genesis`], [`mutate`], [`crossover`]. A
 /// [`Task`] provides a fitness function via its [`oracle`]: we adopt the convention that smaller
 /// values are better (so one can think of the [`oracle`] as providing a measure of error). To opt
 /// out of the default tournament-based selection, implementors may override the [`tournament`]
@@ -154,7 +154,7 @@ pub struct GpParams {
 /// extern crate programinduction;
 /// extern crate rand;
 /// use programinduction::pcfg::{self, Grammar, Rule};
-/// use programinduction::{GpParams, Task, GP, GpSelection};
+/// use programinduction::{GpParams, Task, Gp, GpSelection};
 /// use rand::{rngs::SmallRng, SeedableRng};
 ///
 /// fn evaluator(name: &str, inps: &[i32]) -> Result<i32, ()> {
@@ -220,7 +220,7 @@ pub struct GpParams {
 /// [`Task`]: struct.Task.html
 /// [`oracle`]: struct.Task.html#structfield.oracle
 /// [`pcfg::Grammar`]: pcfg/struct.Grammar.html
-pub trait GP: Send + Sync + Sized {
+pub trait Gp: Send + Sync + Sized {
     /// An Expression is a sentence in the representation. **Tasks are solved by Expressions**.
     type Expression: Clone + Send + Sync;
     /// Extra parameters for a representation go here.

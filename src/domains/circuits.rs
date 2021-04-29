@@ -6,7 +6,7 @@
 //!
 //! ```
 //! use programinduction::domains::circuits;
-//! use programinduction::{EcParams, EC};
+//! use programinduction::{EcParams, Ec};
 //!
 //! let dsl = circuits::dsl();
 //! let tasks = circuits::make_tasks(250);
@@ -55,7 +55,7 @@ pub type Space = bool;
 /// # #[macro_use] extern crate polytype;
 /// # extern crate programinduction;
 /// use programinduction::domains::circuits;
-/// use programinduction::{lambda, EcParams, EC};
+/// use programinduction::{lambda, EcParams, Ec};
 ///
 /// # fn main() {
 /// let dsl = circuits::dsl();

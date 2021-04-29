@@ -7,7 +7,7 @@ use std::time::Duration;
 use programinduction::domains::{circuits, strings};
 use programinduction::lambda;
 use programinduction::pcfg::{self, Grammar, Rule};
-use programinduction::{EcParams, EC};
+use programinduction::{EcParams, Ec};
 
 fn arith_evaluate(name: &str, inps: &[i32]) -> Result<i32, ()> {
     match name {
